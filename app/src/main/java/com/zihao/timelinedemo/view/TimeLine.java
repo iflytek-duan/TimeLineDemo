@@ -3,7 +3,10 @@ package com.zihao.timelinedemo.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathEffect;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -11,7 +14,7 @@ import android.view.View;
  * TODO<自定义时光轴></>
  * Created by zihao on 2016/5/31 16:25.
  */
-public class TimeLine extends View{
+public class TimeLine extends View {
 
     // circle type
     private static final int CIRCLE_TYPE_SOILD = 0;
@@ -20,11 +23,11 @@ public class TimeLine extends View{
     private static final int LINE_TYPE_SOILD = 0;
     private static final int LINE_TYPE_DOTTED = 1;
 
-    private int width,height;
-    private int centerX,centerY;
+    private int width, height;
+    private int centerX, centerY;
     private int radius;
-    private int lineWidth,lineHeight;
-    private Paint circlePaint,linePaint;
+    private int lineWidth, lineHeight;
+    private Paint circlePaint, linePaint;
     private int circleType = CIRCLE_TYPE_SOILD;
     private int lineType = LINE_TYPE_SOILD;
     private int circleColor = Color.BLUE;
@@ -35,10 +38,10 @@ public class TimeLine extends View{
         init();
     }
 
-    private void init(){
+    private void init() {
         // init circlePaint
         circlePaint = new Paint();
-        switch (circleType){
+        switch (circleType) {
             case CIRCLE_TYPE_SOILD:
                 circlePaint.setStyle(Paint.Style.FILL);
                 break;
@@ -52,10 +55,15 @@ public class TimeLine extends View{
         // init linePaint
         linePaint = new Paint();
         linePaint.setStyle(Paint.Style.STROKE);
-        if (lineType == LINE_TYPE_DOTTED){
-
+        if (lineType == LINE_TYPE_DOTTED) {
+            Path path = new Path();
+            path.moveTo(0, 10);
+            path.lineTo(480, 10);
+            PathEffect effects = new DashPathEffect(new float[]{5, 5, 5, 5}, 1);
+            linePaint.setPathEffect(effects);
         }
         linePaint.setAntiAlias(true);
+        linePaint.setColor(lineColor);
 
     }
 
@@ -64,11 +72,11 @@ public class TimeLine extends View{
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         // get view width and height
-        if(width == 0 || height == 0){
+        if (width == 0 || height == 0) {
             int minimumWidth = getSuggestedMinimumWidth();
             int minimumHeight = getSuggestedMinimumHeight();
-            width = resolveMeasured(widthMeasureSpec,minimumWidth);
-            height = resolveMeasured(heightMeasureSpec,minimumHeight);
+            width = resolveMeasured(widthMeasureSpec, minimumWidth);
+            height = resolveMeasured(heightMeasureSpec, minimumHeight);
             centerX = width / 2;
             centerY = height / 2;
         }
@@ -81,14 +89,14 @@ public class TimeLine extends View{
         drawLine(canvas);
     }
 
-    private void drawCircle(Canvas canvas){
-        canvas.drawCircle(centerX,centerY,radius,circlePaint);
+    private void drawCircle(Canvas canvas) {
+        canvas.drawCircle(centerX, centerY, radius, circlePaint);
     }
 
-    private void drawLine(Canvas canvas){
-        int startY = centerY+radius;
+    private void drawLine(Canvas canvas) {
+        int startY = centerY + radius;
         int stopY = startY + lineHeight;
-        canvas.drawLine(centerX,startY,centerX,stopY,linePaint);
+        canvas.drawLine(centerX, startY, centerX, stopY, linePaint);
     }
 
     /**
