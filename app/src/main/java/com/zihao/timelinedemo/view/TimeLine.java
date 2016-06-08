@@ -23,15 +23,22 @@ public class TimeLine extends View {
     private static final int LINE_TYPE_SOILD = 0;
     private static final int LINE_TYPE_DOTTED = 1;
 
-    private int width, height;
-    private int centerX, centerY;
-    private int radius;
-    private int lineWidth, lineHeight;
-    private Paint circlePaint, linePaint;
     private int circleType = CIRCLE_TYPE_SOILD;
     private int lineType = LINE_TYPE_SOILD;
     private int circleColor = Color.BLUE;
-    private int lineColor = Color.GREEN;
+    private int lineColor = Color.BLACK;
+
+    private int width, height;
+    private Paint circlePaint, linePaint;
+
+    // circle params
+    private int centerX, centerY;// X/Y中心点
+    private int radius = 20;// 圆点半径
+    private int pointCount = 5;// 绘制点的总数
+    private int verticalAvgSpace;// 圆点间的竖直间隔距离
+
+    // line params
+    private int lineWidth = 4;// 线宽
 
     public TimeLine(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -79,24 +86,44 @@ public class TimeLine extends View {
             height = resolveMeasured(heightMeasureSpec, minimumHeight);
             centerX = width / 2;
             centerY = height / 2;
+            verticalAvgSpace = height / pointCount;
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        drawCircle(canvas);
         drawLine(canvas);
+        drawCircle(canvas);
     }
 
-    private void drawCircle(Canvas canvas) {
-        canvas.drawCircle(centerX, centerY, radius, circlePaint);
-    }
-
+    /**
+     * 绘制线条
+     * @param canvas
+     *  // 画布
+     */
     private void drawLine(Canvas canvas) {
-        int startY = centerY + radius;
-        int stopY = startY + lineHeight;
-        canvas.drawLine(centerX, startY, centerX, stopY, linePaint);
+        // 绘制一条与View相等高度的线即可--后续用圆点覆盖
+        canvas.drawLine(centerX - lineWidth / 2, 0, centerX + lineWidth / 2, height, linePaint);
+    }
+
+    /**
+     * 绘制圆点
+     * @param canvas
+     *  // 画布
+     */
+    private void drawCircle(Canvas canvas) {
+        int startY = verticalAvgSpace / 2;
+
+        for(int i = 0;i < pointCount;i++){
+            canvas.drawCircle(centerX, startY, radius, circlePaint);
+            startY += verticalAvgSpace;
+        }
+    }
+
+    public void setPointCount(int pointCount) {
+        this.pointCount = pointCount;
+        this.invalidate();
     }
 
     /**
