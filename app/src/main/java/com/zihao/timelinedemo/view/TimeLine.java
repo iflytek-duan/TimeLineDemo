@@ -29,7 +29,7 @@ public class TimeLine extends View {
     private int lineColor = Color.BLACK;
 
     private int width, height;
-    private Paint circlePaint, linePaint;
+    private Paint circlePaint, soildLinePaint ,dottedLinePaint;
 
     // circle params
     private int centerX, centerY;// X/Y中心点
@@ -59,19 +59,23 @@ public class TimeLine extends View {
         circlePaint.setAntiAlias(true);
         circlePaint.setColor(circleColor);
 
-        // init linePaint
-        linePaint = new Paint();
-        linePaint.setStyle(Paint.Style.STROKE);
+        // init soildLinePaint
+        soildLinePaint = new Paint();
+        soildLinePaint.setStyle(Paint.Style.STROKE);
         if (lineType == LINE_TYPE_DOTTED) {
-            Path path = new Path();
-            path.moveTo(0, 10);
-            path.lineTo(480, 10);
-            PathEffect effects = new DashPathEffect(new float[]{5, 5, 5, 5}, 1);
-            linePaint.setPathEffect(effects);
+           // set
         }
-        linePaint.setAntiAlias(true);
-        linePaint.setColor(lineColor);
+        soildLinePaint.setAntiAlias(true);
+        soildLinePaint.setColor(lineColor);
 
+        // init dottedLinePaint
+        dottedLinePaint = new Paint();
+        dottedLinePaint.setStyle(Paint.Style.STROKE);
+        dottedLinePaint.setStrokeWidth(lineWidth);
+        PathEffect effects = new DashPathEffect(new float[]{5, 5, 5, 5}, 1);
+        dottedLinePaint.setPathEffect(effects);
+        dottedLinePaint.setAntiAlias(true);
+        dottedLinePaint.setColor(lineColor);
     }
 
     @Override
@@ -104,7 +108,25 @@ public class TimeLine extends View {
      */
     private void drawLine(Canvas canvas) {
         // 绘制一条与View相等高度的线即可--后续用圆点覆盖
-        canvas.drawLine(centerX - lineWidth / 2, 0, centerX + lineWidth / 2, height, linePaint);
+        int startY = 0;
+        int endY = verticalAvgSpace / 2 - radius;
+        Path path = new Path();
+
+        for(int i = 0;i <= pointCount;i++){
+            //通过moveto，lineto的x，y坐标确定虚线实横，纵，还是倾斜
+            path.reset();
+            path.moveTo(centerX, startY);// 确定虚线起始位置的x,y轴点
+            path.lineTo(centerX, endY);
+            if(i % 2 == 1){
+                canvas.drawPath(path, dottedLinePaint);
+            } else {
+                canvas.drawPath(path, soildLinePaint);
+            }
+            startY = endY + radius * 2;
+            endY += verticalAvgSpace;
+        }
+
+        canvas.drawPath(path, dottedLinePaint);
     }
 
     /**
